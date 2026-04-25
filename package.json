@@ -1,0 +1,20 @@
+{
+  "name": "transcript-verification-hardhat",
+  "version": "1.0.0",
+  "description": "Hardhat project for blockchain-based transcript verification",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js",
+    "hash": "hardhat run scripts/hashTranscript.js",
+    "demo": "hardhat run scripts/demoTranscriptFlow.js",
+    "node": "hardhat node"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.28.6"
+  }
+}

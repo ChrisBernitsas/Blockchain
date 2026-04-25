@@ -1,0 +1,11 @@
+{
+  "studentId": "S1234567",
+  "institution": "Carnegie Mellon University",
+  "credentialId": "CMU-2026-0001",
+  "program": "MS Computational Finance",
+  "issueDate": "2026-04-20",
+  "courses": [
+    { "code": "FINM101", "title": "Stochastic Calculus", "grade": "A" },
+    { "code": "FINM102", "title": "Machine Learning for Finance", "grade": "A-" }
+  ]
+}

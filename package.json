@@ -7,6 +7,8 @@
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.js",
     "hash": "hardhat run scripts/hashTranscript.js",
+    "verify": "hardhat run scripts/verifyTranscript.js",
+    "verify:localhost": "hardhat run scripts/verifyTranscript.js --network localhost",
     "demo": "hardhat run scripts/demoTranscriptFlow.js",
     "node": "hardhat node"
   },

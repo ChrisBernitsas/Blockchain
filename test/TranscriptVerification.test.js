@@ -22,6 +22,13 @@ describe("TranscriptVerification", function () {
     expect(await contract.authorizedIssuers(registrar.address)).to.equal(true);
   });
 
+  it("blocks non-admin from authorizing issuers", async function () {
+    const { contract, registrar, outsider } = await deployFixture();
+    await expect(
+      contract.connect(outsider).setIssuerAuthorization(registrar.address, true)
+    ).to.be.revertedWithCustomError(contract, "NotAuthorizedIssuer");
+  });
+
   it("blocks unauthorized issue attempts", async function () {
     const { contract, outsider } = await deployFixture();
     const hash = ethers.keccak256(ethers.toUtf8Bytes("transcript-v1"));
@@ -65,6 +72,35 @@ describe("TranscriptVerification", function () {
     );
   });
 
+  it("rejects empty credential IDs", async function () {
+    const { contract } = await deployFixture();
+    const hash = ethers.keccak256(ethers.toUtf8Bytes("transcript-v6"));
+
+    await expect(
+      contract.issueTranscript("", hash)
+    ).to.be.revertedWithCustomError(contract, "EmptyCredentialId");
+  });
+
+  it("rejects zero transcript hash", async function () {
+    const { contract } = await deployFixture();
+    const credentialId = "CMU-2026-1006";
+
+    await expect(
+      contract.issueTranscript(credentialId, ethers.ZeroHash)
+    ).to.be.revertedWithCustomError(contract, "ZeroHashNotAllowed");
+  });
+
+  it("rejects revocation of missing credential", async function () {
+    const { contract } = await deployFixture();
+    const credentialId = "CMU-2026-1007";
+
+    await expect(
+      contract.revokeTranscript(credentialId, "Not found")
+    ).to.be.revertedWithCustomError(contract, "CredentialNotFound").withArgs(
+      credentialId
+    );
+  });
+
   it("revokes transcript while keeping record on-chain", async function () {
     const { contract } = await deployFixture();
     const credentialId = "CMU-2026-1005";
@@ -77,5 +113,21 @@ describe("TranscriptVerification", function () {
     expect(record[5]).to.equal(true);
     expect(record[4]).to.equal(false);
     expect(await contract.verifyTranscript(credentialId, hash)).to.equal(false);
+  });
+
+  it("rejects revocation of already revoked credential", async function () {
+    const { contract } = await deployFixture();
+    const credentialId = "CMU-2026-1008";
+    const hash = ethers.keccak256(ethers.toUtf8Bytes("transcript-v8"));
+
+    await contract.issueTranscript(credentialId, hash);
+    await contract.revokeTranscript(credentialId, "Administrative correction");
+
+    await expect(
+      contract.revokeTranscript(credentialId, "Second revocation attempt")
+    ).to.be.revertedWithCustomError(
+      contract,
+      "CredentialAlreadyRevoked"
+    ).withArgs(credentialId);
   });
 });
